@@ -1,132 +1,67 @@
-/*
-* @name Drawing
-* @description Generative painting program.
-*/
+let cols = 10;
+let rows = 10;
+let matrix = new Array(cols);
+let w, h;
+let openSet = [];
+let closedSet = [];
+let start, end;
 
-// All the paths
-let paths = [];
-// Are we painting?
-let painting = false;
-// How long until the next circle
-let next = 0;
-// Where are we now and where were we?
-let current;
-let previous;
+function Spot(i, j) {
+  this.x = i;
+  this.y = j;
+  this.f = 0;
+  this.g = 0;
+  this.h = 0;
+  this.show = function(color) {
+    fill(color);
+    noStroke();
+    rect(this.x * w, this.y * h, w - 1, h - 1);
+  }
+}
 
 function setup() {
-  createCanvas(1000, 800);
-  current = createVector(0,0);
-  previous = createVector(0,0);
-};
+  createCanvas(400, 400);
+  console.log('Creating canvas and init matrix');
+  w = width / cols;
+  h = height / rows;
+
+  for (let index = 0; index < matrix.length; index++) {
+    matrix[index] = new Array(rows);
+  }
+
+  for (let i = 0; i < cols; i++){
+    for (let j = 0; j < cols; j++){
+      matrix[i][j] = new Spot(i, j);
+    }
+  }
+
+  start = matrix[0][0];
+  end = matrix[cols - 1][rows - 1];
+  openSet.push(start);
+
+
+  console.log(matrix);
+}
 
 function draw() {
-  background(200);
-  
-  // If it's time for a new point
-  if (millis() > next && painting) {
+  if (openSet.length > 0) {
 
-    // Grab mouse position      
-    current.x = mouseX;
-    current.y = mouseY;
-
-    // New particle's force is based on mouse movement
-    let force = p5.Vector.sub(current, previous);
-    force.mult(0.05);
-
-    // Add new particle
-    paths[paths.length - 1].add(current, force);
-    
-    // Schedule next circle
-    next = millis() + random(100);
-
-    // Store mouse values
-    previous.x = current.x;
-    previous.y = current.y;
   }
-
-  // Draw all paths
-  for( let i = 0; i < paths.length; i++) {
-    paths[i].update();
-    paths[i].display();
+  else {
+    console.log('No solution');
   }
-}
-
-// Start it up
-function mousePressed() {
-  next = 0;
-  painting = true;
-  previous.x = mouseX;
-  previous.y = mouseY;
-  paths.push(new Path());
-}
-
-// Stop
-function mouseReleased() {
-  painting = false;
-}
-
-// A Path is a list of particles
-class Path {
-  constructor() {
-    this.particles = [];
-    this.hue = random(100);
-  }
-
-  add(position, force) {
-    // Add a new particle with a position, force, and hue
-    this.particles.push(new Particle(position, force, this.hue));
-  }
-  
-  // Display plath
-  update() {  
-    for (let i = 0; i < this.particles.length; i++) {
-      this.particles[i].update();
+  background(0);
+  for (let i = 0; i < cols; i++){
+    for (let j = 0; j < rows; j++){
+      matrix[i][j].show(color(255));
     }
-  }  
-  
-  // Display plath
-  display() {    
-    // Loop through backwards
-    for (let i = this.particles.length - 1; i >= 0; i--) {
-      // If we shold remove it
-      if (this.particles[i].lifespan <= 0) {
-        this.particles.splice(i, 1);
-      // Otherwise, display it
-      } else {
-        this.particles[i].display(this.particles[i+1]);
-      }
-    }
-  
-  }  
-}
-
-// Particles along the path
-class Particle {
-  constructor(position, force, hue) {
-    this.position = createVector(position.x, position.y);
-    this.velocity = createVector(force.x, force.y);
-    this.drag = 0.95;
-    this.lifespan = 255;
   }
 
-  update() {
-    // Move it
-    this.position.add(this.velocity);
-    // Slow it down
-    this.velocity.mult(this.drag);
-    // Fade it out
-    this.lifespan--;
+  for (let i = 0; i < openSet.length; i++){
+    openSet[i].show(color(255, 0, 0));
   }
 
-  // Draw particle and connect it with a line
-  // Draw a line to another
-  display(other) {
-    stroke(0, this.lifespan);
-    fill(0, this.lifespan/2);    
-    ellipse(this.position.x,this.position.y, 8, 8);    
-    // If we need to draw a line
-    if (other) {
-      line(this.position.x, this.position.y, other.position.x, other.position.y);
-    }
+  for (let i = 0; i < closedSet.length; i++){
+    closedSet[i].show(color(255, 0, 0));
   }
 }
