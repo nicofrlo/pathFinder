@@ -1,18 +1,28 @@
-let cols = 50;
-let rows = 50;
+let cols = 30;
+let rows = 30;
 let matrix = new Array(cols);
 let w, h;
 let openSet = [];
 let closedSet = [];
 let start, end;
 let path = [];
+
+let started = false;
 function removeFromArray(arr, el) {
   for (let index = arr.length - 1; index >= 0; index--) {
     if (arr[index] === el){
       arr.splice(index, 1);
       //return;
     }
-    
+  }
+}
+
+function starto() {
+  if (started) {
+  }
+  else {
+  loop();
+  started = true;
   }
 }
 
@@ -30,9 +40,9 @@ function Spot(i, j) {
   this.neighbors = [];
   this.previous = undefined;
   this.block = false;
-  if (random(1) < 0.5) {
-    this.block = true;
-  }
+  // if (random(1) < 0.2) {
+  //   this.block = true;
+  // }
   this.show = function(color) {
     fill(color);
     if (this.block) {
@@ -72,9 +82,17 @@ function Spot(i, j) {
     }
   }
 }
+function mouseDragged() {
+  const xb = Math.floor(mouseX / w);
+  const yb = Math.floor(mouseY / h);
+  matrix[xb][yb].block = true;
+  return false;
+}
+function mouseClicked() { mouseDragged();}
+
 
 function setup() {
-  createCanvas(800, 800);
+  createCanvas(displayHeight, displayHeight);
   console.log('Creating canvas and init matrix');
   w = width / cols;
   h = height / rows;
@@ -101,11 +119,11 @@ function setup() {
   end.block = false;
   openSet.push(start);
 
-
   console.log(matrix);
 }
 
 function draw() {
+  if (started) {
   let current;
   if (openSet.length > 0) {
 
@@ -119,7 +137,7 @@ function draw() {
 
     if (current === end) {
       noLoop();
-
+      started = false;
 
 
       console.log('done');
@@ -135,18 +153,23 @@ function draw() {
 
       if (!closedSet.includes(neighbor) && !neighbor.block) {
         let tmpG = current.g + 1;
+        let newPath = false;
         if (openSet.includes(neighbor)) {
           if (tmpG < neighbor.g) {
             neighbor.g = tmpG;
+            newPath = true;
           }
         } else {
           neighbor.g = tmpG;
+          newPath = true;
           openSet.push(neighbor);
         }
-
+        
+        if (newPath){
         neighbor.h = heuristic(neighbor, end);
         neighbor.f = neighbor.g + neighbor.h;
         neighbor.previous = current;
+        }
       }
 
       
@@ -163,7 +186,6 @@ function draw() {
       matrix[i][j].show(color(255));
     }
   }
-
   for (let i = 0; i < openSet.length; i++){
     openSet[i].show(color(255, 255, 0));
   }
@@ -183,6 +205,14 @@ function draw() {
 
   for (let index = 0; index < path.length; index++) {
     path[index].show(color(0, 0, 255));
-    
   }
+}
+else {
+  background(0);
+  for (let i = 0; i < cols; i++){
+    for (let j = 0; j < rows; j++){
+      matrix[i][j].show(color(255));
+    }
+  }
+}
 }
