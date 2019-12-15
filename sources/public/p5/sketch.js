@@ -1,5 +1,141 @@
-let cols = 30;
-let rows = 30;
+function removeFromArray(arr, el) {
+  for (let index = arr.length - 1; index >= 0; index--) {
+    if (arr[index] === el){
+      arr.splice(index, 1);
+      return;
+    }
+  }
+}
+
+function coordsToString(x, y){
+  return `${x},${y}`;
+}
+function addToMaze(x, y, matrix) {
+  matrix[x][y] = false;
+  return coordsToString(x, y);
+}
+
+function getRandomInt(max) {
+  return Math.floor(Math.random() * Math.floor(max));
+}
+
+function addWalls(x, y, cols, rows, partMaze, wallList, wallsVisited) {
+    if (x < cols - 1) {
+      let coord = coordsToString(x + 1, y);
+      if (!partMaze.includes(coord) && !wallsVisited.includes(coord)){
+        wallList.push(coord);
+        wallsVisited.push(coord);
+      }
+    }
+    if (x > 0) {
+      let coord = coordsToString(x - 1, y);
+      if (!partMaze.includes(coord) && !wallsVisited.includes(coord)){
+        wallList.push(coord);
+        wallsVisited.push(coord);
+      }
+    }
+    if (y < rows - 1) {
+      let coord = coordsToString(x, y + 1);
+      if (!partMaze.includes(coord) && !wallsVisited.includes(coord)){
+        wallList.push(coord);
+        wallsVisited.push(coord);
+      }
+    }
+    if (y > 0) {
+      let coord = coordsToString(x, y - 1);
+      if (!partMaze.includes(coord) && !wallsVisited.includes(coord)){
+        wallList.push(coord);
+        wallsVisited.push(coord);
+      }
+    }
+}
+
+function onlyOneConnexion(x, y, cols, rows, partMaze) {
+  let nb = 0;
+  if (x < cols - 1) {
+    let coord = coordsToString(x + 1, y);
+    if (partMaze.includes(coord)){
+      nb++;
+    }
+  }
+  if (x > 0) {
+    let coord = coordsToString(x - 1, y);
+    if (partMaze.includes(coord)){
+      nb++;
+    }
+  }
+  if (y < rows - 1) {
+    let coord = coordsToString(x, y + 1);
+    if (partMaze.includes(coord)){
+      nb++;
+    }
+  }
+  if (y > 0) {
+    let coord = coordsToString(x, y - 1);
+    if (partMaze.includes(coord)){
+      nb++;
+    }
+  }
+
+  return nb > 1 ? false : true;
+}
+
+function maze(x, y) {
+  console.log('entering maze function');
+  let wallList = [];
+  let partMaze = [];
+  let wallsVisited = [];
+  let matrix = new Array(x);
+  for (let index = 0; index < matrix.length; index++) {
+    matrix[index] = new Array(y);
+  }
+  for (let i = 0; i < x; i++){
+    for (let j = 0; j < y; j++){
+      matrix[i][j] = true;
+    }
+  }
+
+  let curX = 0;
+  let curY = 0;
+  //Pick a cell, mark it as part of the maze. Add the walls of the cell to the wall list.
+  partMaze.push(addToMaze(curX, curY, matrix));
+  addWalls(curX, curY, x, y, partMaze, wallList, wallsVisited);
+  while (wallList.length) {
+    let curWall = wallList[getRandomInt(wallList.length - 1)];
+    let parsed = curWall.split(',');
+    curX = parseInt(parsed[0], 10);
+    curY = parseInt(parsed[1], 10);
+    if (onlyOneConnexion(curX, curY, x, y, partMaze)){
+      partMaze.push(addToMaze(curX, curY, matrix));
+      addWalls(curX, curY, x, y, partMaze, wallList, wallsVisited);
+    }
+    removeFromArray(wallList, curWall);
+  }
+
+
+
+  return matrix;
+}
+
+
+let cols = 50;
+let rows = 50;
+let randomMaze = new Array(cols);
+for (let index = 0; index < randomMaze.length; index++) {
+  randomMaze[index] = new Array(rows);
+  for (let j = 0; j < rows; j++){
+    randomMaze[index][j] = false;
+  }
+}
+function generateMaze() {
+  randomMaze = maze(cols, rows);
+  for (let i = 0; i < cols; i++){
+    for (let j = 0; j < cols; j++){
+      matrix[i][j].block = randomMaze[i][j];
+    }
+  }
+}
+
 let matrix = new Array(cols);
 let w, h;
 let openSet = [];
@@ -8,14 +144,7 @@ let start, end;
 let path = [];
 
 let started = false;
-function removeFromArray(arr, el) {
-  for (let index = arr.length - 1; index >= 0; index--) {
-    if (arr[index] === el){
-      arr.splice(index, 1);
-      //return;
-    }
-  }
-}
+
 
 function starto() {
   if (started) {
@@ -119,7 +248,6 @@ function setup() {
   end.block = false;
   openSet.push(start);
 
-  console.log(matrix);
 }
 
 function draw() {
