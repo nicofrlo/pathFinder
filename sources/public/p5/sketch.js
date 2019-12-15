@@ -1,3 +1,15 @@
+let cols = 30;
+let rows = 30;
+
+let matrix = new Array(cols);
+let w, h;
+let openSet = [];
+let closedSet = [];
+let start, end;
+let path = [];
+
+let started = false;
+
 function removeFromArray(arr, el) {
   for (let index = arr.length - 1; index >= 0; index--) {
     if (arr[index] === el){
@@ -17,6 +29,20 @@ function addToMaze(x, y, matrix) {
 
 function getRandomInt(max) {
   return Math.floor(Math.random() * Math.floor(max));
+}
+
+function isDiag(x, y, destX, destY) {
+  return ((abs(destX - x) + abs(destY - y) ) > 1);
+}
+
+function validDiag(x, y, destX, destY, matrix) {
+  // Check this is a diagonal move first, if not then return true
+  if (!isDiag(x, y, destX, destY)) {
+    return true;
+  }
+  let deltaX = destX - x;
+  let deltaY = destY - y;
+  return !(matrix[x + deltaX][y].block && matrix[x][y + deltaY].block);
 }
 
 function addWalls(x, y, cols, rows, partMaze, wallList, wallsVisited) {
@@ -118,8 +144,7 @@ function maze(x, y) {
 }
 
 
-let cols = 50;
-let rows = 50;
+
 let randomMaze = new Array(cols);
 for (let index = 0; index < randomMaze.length; index++) {
   randomMaze[index] = new Array(rows);
@@ -128,22 +153,29 @@ for (let index = 0; index < randomMaze.length; index++) {
   }
 }
 function generateMaze() {
+  if (started) {
+     matrix = new Array(cols);
+ openSet = [];
+ closedSet = [];
+ path = [];
+ started = false;
+    setup();
+    loop();
+
+  }
   randomMaze = maze(cols, rows);
   for (let i = 0; i < cols; i++){
     for (let j = 0; j < cols; j++){
       matrix[i][j].block = randomMaze[i][j];
     }
   }
+  // If the last case is a block regenerate the maze
+  if (randomMaze[cols - 1][rows - 1]) {
+    generateMaze();
+  }
 }
 
-let matrix = new Array(cols);
-let w, h;
-let openSet = [];
-let closedSet = [];
-let start, end;
-let path = [];
 
-let started = false;
 
 
 function starto() {
@@ -197,15 +229,19 @@ function Spot(i, j) {
     }
 
     // Diagonals
+    // top left
     if (x > 0 && y > 0) {
       this.neighbors.push(matrix[x - 1][y - 1])
     }
+    // top right
     if (x < cols - 1 && y > 0) {
       this.neighbors.push(matrix[x + 1][y - 1])
     }
+    // down right
     if (x < cols - 1 && y < rows - 1) {
       this.neighbors.push(matrix[x + 1][y + 1])
     }
+    // down left
     if (x > 0 && y < rows - 1) {
       this.neighbors.push(matrix[x - 1][y + 1])
     }
@@ -265,9 +301,6 @@ function draw() {
 
     if (current === end) {
       noLoop();
-      started = false;
-
-
       console.log('done');
 
     }
@@ -277,9 +310,8 @@ function draw() {
     let neighbors = current.neighbors;
     for (let index = 0; index < neighbors.length; index++) {
       let neighbor = neighbors[index];
-
-
-      if (!closedSet.includes(neighbor) && !neighbor.block) {
+      if (!closedSet.includes(neighbor) && !neighbor.block 
+      && validDiag(current.x, current.y, neighbor.x, neighbor.y, matrix)) {
         let tmpG = current.g + 1;
         let newPath = false;
         if (openSet.includes(neighbor)) {
@@ -313,9 +345,6 @@ function draw() {
     for (let j = 0; j < rows; j++){
       matrix[i][j].show(color(255));
     }
-  }
-  for (let i = 0; i < openSet.length; i++){
-    openSet[i].show(color(255, 255, 0));
   }
 
   for (let i = 0; i < closedSet.length; i++){
