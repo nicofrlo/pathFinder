@@ -166,12 +166,7 @@ for (let index = 0; index < randomMaze.length; index++) {
 
 function generateMaze() {
   if (started) {
-    matrix = new Array(cols);
-    openSet = [];
-    closedSet = [];
-    path = [];
-    started = false;
-    setup();
+    reset();
     loop();
   }
   randomMaze = maze(cols, rows);
@@ -198,6 +193,15 @@ function starto() {
   loop();
   started = true;
   }
+}
+
+function reset() {
+  matrix = new Array(cols);
+    openSet = [];
+    closedSet = [];
+    path = [];
+    started = false;
+    setup();
 }
 
 function heuristic(a, b) {
