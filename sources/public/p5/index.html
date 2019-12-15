@@ -2,12 +2,15 @@
     <script src="p5.js"></script>
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css">
     <meta charset="utf-8">
+    <script src="sketch.js"></script>
 
   </head>
   <body>
-    <script src="sketch.js"></script>
-    <button onclick="starto()" type="button">Starto</button>
-    <button onclick="generateMaze()" type="button">Make a random Maze</button>
-  
+    <div class="container">
+      <h2>A* pathfinding algorithm</h2>
+      <a href="#" onclick="starto()" class="btn-gradient cyan mini">Start path finding</a>
+      <a href="#" onclick="generateMaze()" class="btn-gradient orange mini">Generate random maze</a>
+      <a href="#" class="btn-gradient red mini">Reset</a>
+    </div>
 
 </body></html>

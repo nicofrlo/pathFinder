@@ -166,14 +166,13 @@ for (let index = 0; index < randomMaze.length; index++) {
 
 function generateMaze() {
   if (started) {
-     matrix = new Array(cols);
- openSet = [];
- closedSet = [];
- path = [];
- started = false;
+    matrix = new Array(cols);
+    openSet = [];
+    closedSet = [];
+    path = [];
+    started = false;
     setup();
     loop();
-
   }
   randomMaze = maze(cols, rows);
   for (let i = 0; i < cols; i++){
@@ -262,17 +261,19 @@ function Spot(i, j) {
   }
 }
 function mouseDragged() {
-  const xb = Math.floor(mouseX / w);
-  const yb = Math.floor(mouseY / h);
-  matrix[xb][yb].block = true;
-  showGrid(200);
+  if (!started){
+    const xb = Math.floor(mouseX / w);
+    const yb = Math.floor(mouseY / h);
+    matrix[xb][yb].block = true;
+    showGrid(200);
+  }
   return false;
 }
 function mouseClicked() { mouseDragged();}
 
 
 function setup() {
-  createCanvas(displayHeight, displayHeight);
+  let cvn = createCanvas(displayHeight, displayHeight);
   console.log('Creating canvas and init matrix');
   w = width / cols;
   h = height / rows;
