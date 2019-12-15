@@ -10,6 +10,15 @@ let path = [];
 
 let started = false;
 
+function showGrid(color) {
+  background(0);
+  for (let i = 0; i < cols; i++){
+    for (let j = 0; j < rows; j++){
+      matrix[i][j].show(color);
+    }
+  }
+}
+
 function removeFromArray(arr, el) {
   for (let index = arr.length - 1; index >= 0; index--) {
     if (arr[index] === el){
@@ -152,6 +161,9 @@ for (let index = 0; index < randomMaze.length; index++) {
     randomMaze[index][j] = false;
   }
 }
+
+
+
 function generateMaze() {
   if (started) {
      matrix = new Array(cols);
@@ -173,6 +185,8 @@ function generateMaze() {
   if (randomMaze[cols - 1][rows - 1]) {
     generateMaze();
   }
+
+  showGrid(200);
 }
 
 
@@ -188,7 +202,7 @@ function starto() {
 }
 
 function heuristic(a, b) {
-  // return dist(a.x, a.y, b.x, b.y);
+   //return dist(a.x, a.y, b.x, b.y);
   return abs(a.x - b.x) + abs(a.y - b.y);
 }
 
@@ -251,6 +265,7 @@ function mouseDragged() {
   const xb = Math.floor(mouseX / w);
   const yb = Math.floor(mouseY / h);
   matrix[xb][yb].block = true;
+  showGrid(200);
   return false;
 }
 function mouseClicked() { mouseDragged();}
@@ -283,7 +298,7 @@ function setup() {
   start.block = false;
   end.block = false;
   openSet.push(start);
-
+  showGrid(200);
 }
 
 function draw() {
@@ -299,11 +314,7 @@ function draw() {
     }
     current = openSet[winner];
 
-    if (current === end) {
-      noLoop();
-      console.log('done');
-
-    }
+    
     removeFromArray(openSet, current);
     closedSet.push(current);
 
@@ -340,16 +351,6 @@ function draw() {
     noLoop();
     return;
   }
-  background(0);
-  for (let i = 0; i < cols; i++){
-    for (let j = 0; j < rows; j++){
-      matrix[i][j].show(color(255));
-    }
-  }
-
-  for (let i = 0; i < closedSet.length; i++){
-    closedSet[i].show(color(255, 0, 0));
-  }
 
   // Get the path till then end
   path = [];
@@ -359,17 +360,27 @@ function draw() {
     path.push(temp.previous);
     temp = temp.previous;
   }
-
-  for (let index = 0; index < path.length; index++) {
-    path[index].show(color(0, 0, 255));
-  }
-}
-else {
-  background(0);
-  for (let i = 0; i < cols; i++){
-    for (let j = 0; j < rows; j++){
-      matrix[i][j].show(color(255));
+  if (current === end) {
+    noLoop();
+    noFill();
+    stroke(color(255,0,255));
+    strokeWeight(w/3);
+    beginShape();
+    for (let index = 0; index < path.length; index++) {
+      vertex(path[index].x * w + w / 2, path[index].y * h + h / 2);
     }
+    endShape();
+    console.log('done');
+
   }
-}
+
+  noFill();
+  stroke(color(70,0,255));
+  strokeWeight(w/4);
+  beginShape();
+  for (let index = 0; index < path.length; index++) {
+    vertex(path[index].x * w + w / 2, path[index].y * h + h / 2);
+  }
+  endShape();
+  }
 }
