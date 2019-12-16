@@ -1,2 +1,2 @@
 # pathFinder
-Visualization of pathfinding algorithm
+Visualization of A* pathfinding algorithm
